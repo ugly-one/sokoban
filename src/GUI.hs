@@ -17,7 +17,6 @@ stepsString = Just "Steps: "
 
 main :: IO ()
 main = do
-  state <- newIORef world
   initGUI
   window <- windowNew
   set window [
@@ -28,7 +27,8 @@ main = do
   mapGrid <- gridNew
   prepareGrid mapGrid world
 
-  displayWorld mapGrid (readIORef state)
+  state <- newIORef [world]
+  displayWorld mapGrid state
 
   appGrid <- gridNew
   gridAttach appGrid mapGrid 0 0 1 1
@@ -60,22 +60,42 @@ main = do
     liftIO ( move Right state mapGrid )
     liftIO  ( updateCounter scoreWidget state )
 
+  window `on` keyPressEvent $ tryEvent $ do
+    [Control] <- eventModifier
+    "z" <- eventKeyName
+    liftIO  ( print "ctrl + z pressed" )
+    liftIO ( undo state)
+    liftIO  ( updateCounter scoreWidget state )
+    liftIO (updateDisplay mapGrid state)
+
   on window objectDestroy mainQuit
   widgetShowAll window
   mainGUI
 
 
-updateCounter :: Label -> IORef World -> IO()
+updateCounter :: Label -> IORef [World] -> IO()
 updateCounter textBox state = do
-  w <- readIORef state
-  let steps = mSteps w
+  currentState <- readIORef state
+  let currentWorld = head currentState
+  let steps = mSteps currentWorld
   set textBox [labelText := "Score: " ++ show steps]
 
+removeWorld :: [World] -> [World]
+removeWorld [] = []
+removeWorld [w] = [w]
+removeWorld (w:rest) = rest
 
-move :: Input -> IORef World -> Grid -> IO ()
+undo :: IORef[World] -> IO()
+undo state = do
+  currentState <- readIORef state
+  atomicModifyIORef state (\s -> ((removeWorld s) , ()))
+
+move :: Input -> IORef [World] -> Grid -> IO ()
 move input state grid = do
-  atomicModifyIORef state (\w -> (modifyWorld w input, ()))
-  updateDisplay grid (readIORef state)
+  currentWorld <- readIORef state
+  let newWorld = modifyWorld (head currentWorld) input
+  atomicModifyIORef state (\w -> (newWorld : currentWorld, ()))
+  updateDisplay grid state
 
 
 prepareGrid :: Grid -> World -> IO()
@@ -102,18 +122,20 @@ updateImage grid (x, y) buff = do
       imageSetFromPixbuf image aa
 
 
-displayWorld :: Grid -> IO World -> IO ()
-displayWorld grid world = do
-  w <- world
+displayWorld :: Grid -> IORef [World] -> IO ()
+displayWorld grid worlds = do
+  ws <- readIORef worlds
+  let w = head ws
   let (maxX, maxY) = mMax w
   let coordinates = concat [[(x,y) | x <- [0..maxX]] | y <- [0..maxY]]
   let toUpdate = map (\coord -> (getImageBuffer w coord, coord)) coordinates
   forM_ toUpdate (\(p,c) -> updateImage grid c p)
 
 
-updateDisplay :: Grid -> IO World -> IO ()
-updateDisplay grid world = do
-    w <- world
+updateDisplay :: Grid -> IORef [World] -> IO ()
+updateDisplay grid worlds = do
+    ws <- readIORef worlds
+    let w = head ws
     let (maxX, maxY) = mMax w
     let coordinates = concat [[(x,y) | x <- [0..maxX]] | y <- [0..maxY]]
     let toUpdate = map (\coord -> (getImageBuffer w coord, coord)) coordinates
@@ -122,7 +144,7 @@ updateDisplay grid world = do
 
 -- updating only squared that are around the worker - nothing else can posibly move
 isUpdatable :: World -> Coord -> Bool
-isUpdatable w (x,y) = abs( x - wx ) <= 1 && abs (y - wy) <=1
+isUpdatable w (x,y) = abs( x - wx ) <= 2 && abs (y - wy) <= 2
   where (wx, wy) = mWorker w
 
 
