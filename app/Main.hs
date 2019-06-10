@@ -134,9 +134,9 @@ getImageBuffer world coord =
                 | isStorage world coord -> getStorageImage
                 | otherwise -> getEmptyImage
     where getImage fileName = pixbufNewFromFileAtSize fileName 40 40
-          getWorkerImage = getImage (pack "penguin-icon.png")
-          getBoxImage = getImage (pack "wooden_box_512.png")
-          getWallImage = getImage (pack "brick_wall-512.png")
-          getStorageImage = getImage (pack "dot.png")
-          getEmptyImage = getImage (pack "empty.png")
-          getBoxOnStorageImage = getImage (pack "crateStorage.png")
+          getWorkerImage = getImage (pack "images/penguin.png")
+          getBoxImage = getImage (pack "images/crate.png")
+          getWallImage = getImage (pack "images/wall.png")
+          getStorageImage = getImage (pack "images/dot.png")
+          getEmptyImage = getImage (pack "images/empty.png")
+          getBoxOnStorageImage = getImage (pack "images/crateStorage.png")
