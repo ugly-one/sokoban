@@ -5,7 +5,7 @@ module GUI (main) where
 import Graphics.UI.Gtk
 import Sokoban
 import Data.Maybe (catMaybes)
-import Control.Monad (mapM_, forM_, forM)
+import Control.Monad (mapM_, forM_, forM, when)
 import Control.Monad.IO.Class (liftIO)
 import Data.IORef (newIORef, atomicModifyIORef, readIORef, IORef)
 import Data.Text (pack)
@@ -63,7 +63,6 @@ main = do
   window `on` keyPressEvent $ tryEvent $ do
     [Control] <- eventModifier
     "z" <- eventKeyName
-    liftIO  ( print "ctrl + z pressed" )
     liftIO ( undo state)
     liftIO  ( updateCounter scoreWidget state )
     liftIO (updateDisplay mapGrid state)
@@ -92,9 +91,9 @@ undo state = do
 
 move :: Input -> IORef [World] -> Grid -> IO ()
 move input state grid = do
-  currentWorld <- readIORef state
-  let newWorld = modifyWorld (head currentWorld) input
-  atomicModifyIORef state (\w -> (newWorld : currentWorld, ()))
+  currentWorlds <- readIORef state
+  let newWorld = modifyWorld (head currentWorlds) input
+  when (newWorld /= (head currentWorlds)) $ atomicModifyIORef state (\w -> (newWorld : currentWorlds, ()))
   updateDisplay grid state
 
 

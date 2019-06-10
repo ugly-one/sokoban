@@ -26,7 +26,7 @@ data World = World {
     mStorages :: [Coord],
     mWorker :: Coord,
     mMax :: Coord,
-    mSteps :: Int} deriving(Show)
+    mSteps :: Int} deriving(Show, Eq)
 
 data Input = Up | Down | Left | Right deriving(Show)
 
