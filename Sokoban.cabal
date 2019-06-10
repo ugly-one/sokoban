@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 655ac6efb6a032f32906c854054fc46f3f1e0ccdc8546fec8937096462d8b112
+-- hash: 414807926a26f7634fa6d2ec1fcbf038e61ea616080701641134d9b09b35236c
 
 name:           Sokoban
 version:        0.1.0.0
@@ -27,6 +27,8 @@ source-repository head
 
 library
   exposed-modules:
+      Console
+      GUI
       Sokoban
   other-modules:
       Paths_Sokoban
@@ -41,8 +43,6 @@ library
 executable Sokoban-exe
   main-is: Main.hs
   other-modules:
-      Console
-      GUI
       Paths_Sokoban
   hs-source-dirs:
       app
