@@ -74,7 +74,7 @@ updateCounter textBox state = do
 
 move :: Input -> IORef World -> Grid -> IO ()
 move input state grid = do
-  atomicModifyIORef state (\w -> (modifyWorldValidation w input, ()))
+  atomicModifyIORef state (\w -> (modifyWorld w input, ()))
   updateDisplay grid (readIORef state)
 
 

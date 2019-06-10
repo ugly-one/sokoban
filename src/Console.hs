@@ -51,10 +51,7 @@ gameLoop world = do
     clear
     displayWorld world
     input <- getInput
-    let world' = if isValid world input
-        then modifyWorld world input
-        else world
-
+    let world' = modifyWorld world input
     if isFinished world'
     then clear >> print "well done" >> displayWorld world'
     else gameLoop world'
