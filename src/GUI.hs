@@ -24,6 +24,7 @@ main = do
     windowDefaultWidth := 500,
     windowDefaultHeight := 500 ]
 
+  world <- loadLevel 1
   mapGrid <- gridNew
   prepareGrid mapGrid world
 

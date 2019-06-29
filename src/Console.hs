@@ -7,6 +7,8 @@ import Prelude hiding (Either(..))
 import Control.Monad (forM_)
 import System.IO ( stdin, stdout, hSetEcho, hSetBuffering, BufferMode(..) )
 import Sokoban
+import Data.List.Split (splitOn)
+import Data.List (elemIndex)
 
 getStringRepresentation :: World -> Coord -> String
 getStringRepresentation world coord =
@@ -61,4 +63,5 @@ main = do
     hSetEcho stdin False
     hSetBuffering stdin NoBuffering
     hSetBuffering stdout NoBuffering
+    world <- loadLevel 0
     gameLoop world

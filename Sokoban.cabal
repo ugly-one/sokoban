@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 414807926a26f7634fa6d2ec1fcbf038e61ea616080701641134d9b09b35236c
+-- hash: 4fc850add97a717845ca7c43e5968f07833971720dedfedf561c66dcd4b0c27d
 
 name:           Sokoban
 version:        0.1.0.0
@@ -37,6 +37,7 @@ library
   build-depends:
       base >=4.7 && <5
     , gtk3
+    , split
     , text
   default-language: Haskell2010
 
@@ -51,6 +52,7 @@ executable Sokoban-exe
       Sokoban
     , base >=4.7 && <5
     , gtk3
+    , split
     , text
   default-language: Haskell2010
 
@@ -66,5 +68,6 @@ test-suite Sokoban-test
       Sokoban
     , base >=4.7 && <5
     , gtk3
+    , split
     , text
   default-language: Haskell2010

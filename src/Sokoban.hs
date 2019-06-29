@@ -9,14 +9,14 @@ module Sokoban
         isValid,
         modifyWorld,
         isFinished,
-        loadLevel,
-        world,
-        simpleWorld
+        parseLevel,
+        loadLevel
     ) where
 
 import Data.List (sort, delete)
 import Prelude hiding (Either(..))
 import Control.Monad (forM_)
+import Data.List.Split (splitOn)
 
 type Coord = (Int, Int)
 
@@ -52,10 +52,6 @@ world2 = [
     "    #######        "
     ]
 
-
-simpleWorld = loadLevel basicWorldString
-world = loadLevel world2
-
 emptyWorld :: World
 emptyWorld = World{
     mWalls = [],
@@ -73,8 +69,20 @@ updateWorld world (coord, c) =
                 '.' -> world {mStorages = coord:(mStorages world)}
                 _ -> world
 
-loadLevel :: [String] -> World
-loadLevel str = do
+loadLevel :: Int -> IO World
+loadLevel nr = do
+    worldsNotParsed <- loadLevelsFromFile
+    let worlds = map parseLevel worldsNotParsed
+    return (worlds !! nr)
+
+loadLevelsFromFile :: IO [[String]]
+loadLevelsFromFile = do
+    contents <- readFile "src/levels-only-2.txt"
+    let worlds = (splitOn "\n\n" contents) :: [String]
+    return (map (\w -> splitOn "\n" w) worlds)
+
+parseLevel :: [String] -> World
+parseLevel str = do
     let coordinates = [[(x,y) | x <- [0..]] | y <- [0..]]
     let elements = concat $ zipWith zip coordinates str
     let world = foldl updateWorld emptyWorld elements
