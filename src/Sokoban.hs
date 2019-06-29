@@ -37,21 +37,6 @@ basicWorldString = [
     "#####"
     ]
 
-world2 :: [String]
-world2 = [
-    "    #####          ",
-    "    #   #          ",
-    "    #o  #          ",
-    "  ###  o##         ",
-    "  #  o o #         ",
-    "### # ## #   ######",
-    "#   # ## #####  ..#",
-    "# o  o          ..#",
-    "##### ### #@##  ..#",
-    "    #     #########",
-    "    #######        "
-    ]
-
 emptyWorld :: World
 emptyWorld = World{
     mWalls = [],
@@ -68,25 +53,6 @@ updateWorld world (coord, c) =
                 'o' -> world {mCrates = coord:(mCrates world)}
                 '.' -> world {mStorages = coord:(mStorages world)}
                 _ -> world
-
-loadLevel :: Int -> IO World
-loadLevel nr = do
-    worldsNotParsed <- loadLevelsFromFile
-    let worlds = map parseLevel worldsNotParsed
-    return (worlds !! nr)
-
-loadLevelsFromFile :: IO [[String]]
-loadLevelsFromFile = do
-    contents <- readFile "src/levels-only-2.txt"
-    let worlds = (splitOn "\n\n" contents) :: [String]
-    return (map (\w -> splitOn "\n" w) worlds)
-
-parseLevel :: [String] -> World
-parseLevel str = do
-    let coordinates = [[(x,y) | x <- [0..]] | y <- [0..]]
-    let elements = concat $ zipWith zip coordinates str
-    let world = foldl updateWorld emptyWorld elements
-    world {mMax = fst (last elements)}
 
 
 modifyWorld :: World -> Input -> World
@@ -141,3 +107,46 @@ isCrate world coord = elem coord (mCrates world)
 isFinished :: World -> Bool
 isFinished world = sort (mCrates world) == sort (mStorages world)
 
+-- parsing levels
+loadLevel :: Int -> IO World
+loadLevel nr = do
+    worldsNotParsed <- loadLevelsFromFile
+    let worldToParse = worldsNotParsed !! nr
+    let worldToParse2 = makeEachItemSameLength worldToParse
+    let world = parseLevel worldToParse2
+    return world
+
+loadLevelsFromFile :: IO [[String]]
+loadLevelsFromFile = do
+    contents <- readFile "src/levels.txt"
+    let worlds = (splitOn "\n\n" contents) :: [String]
+    return (map (\w -> splitOn "\n" w) worlds)
+
+parseLevel :: [String] -> World
+parseLevel str = do
+    let coordinates = [[(x,y) | x <- [0..]] | y <- [0..]]
+    let elements = concat $ zipWith zip coordinates str
+    let world = foldl updateWorld emptyWorld elements
+    world {mMax = fst (last elements)}
+
+makeEachItemSameLength :: [String] -> [String]
+makeEachItemSameLength items =
+    map (adjustLength desiredLength) items
+    where desiredLength = findBiggestLength items
+
+adjustLength :: Int -> String -> String
+adjustLength desiredLength item =
+    item ++ concat (replicate lenghtDifference " ")
+    where lenghtDifference = abs (desiredLength - length item)
+
+findBiggestLength :: [String] -> Int
+findBiggestLength = foldl getLength 0
+
+getLength :: Int -> String -> Int
+getLength l value =
+    if valueLength > l
+        then valueLength
+    else l
+    where valueLength = length value
+
+-- end of parsing levels

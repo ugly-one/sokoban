@@ -58,10 +58,10 @@ gameLoop world = do
     then clear >> print "well done" >> displayWorld world'
     else gameLoop world'
 
-main :: IO ()
-main = do
+main :: Int -> IO ()
+main levelNr = do
     hSetEcho stdin False
     hSetBuffering stdin NoBuffering
     hSetBuffering stdout NoBuffering
-    world <- loadLevel 0
+    world <- loadLevel levelNr
     gameLoop world

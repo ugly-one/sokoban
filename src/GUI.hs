@@ -15,8 +15,8 @@ stepsString :: Maybe String
 stepsString = Just "Steps: "
 
 
-main :: IO ()
-main = do
+main :: Int -> IO ()
+main levelNr = do
   initGUI
   window <- windowNew
   set window [
@@ -24,7 +24,7 @@ main = do
     windowDefaultWidth := 500,
     windowDefaultHeight := 500 ]
 
-  world <- loadLevel 1
+  world <- loadLevel levelNr
   mapGrid <- gridNew
   prepareGrid mapGrid world
 

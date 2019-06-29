@@ -5,4 +5,4 @@ import qualified GUI as G
 
 main :: IO()
 --main = C.main
-main = G.main
+main = G.main 2
